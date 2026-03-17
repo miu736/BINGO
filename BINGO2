@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ビンゴゲーム</title>
+<title>BINGOゲーム</title>
 <style>
   body {
     font-family: sans-serif;
     text-align: center;
-    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
     margin: 0;
     padding: 20px;
   }
@@ -17,34 +17,36 @@
 
   #board {
     display: grid;
-    grid-template-columns: repeat(5, 60px);
+    grid-template-columns: repeat(5, 70px);
     gap: 10px;
     justify-content: center;
     margin: 20px auto;
   }
 
   .cell {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: white;
-    border-radius: 10px;
+    border-radius: 15px;
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: 0.2s;
   }
 
   .marked {
-    background: #ff7eb3;
+    background: #ff4d88;
     color: white;
+    transform: scale(1.1);
   }
 
   button {
     padding: 10px 20px;
     border: none;
-    border-radius: 10px;
-    background: #7aa7ff;
+    border-radius: 20px;
+    background: #ff4d88;
     color: white;
     font-size: 16px;
     cursor: pointer;
@@ -56,25 +58,25 @@
     font-size: 18px;
   }
 
-  #message {
-    margin-top: 20px;
-    font-size: 20px;
-    font-weight: bold;
-  }
-
   #history {
-    max-width: 300px;
+    max-width: 350px;
     margin: 10px auto;
     background: white;
     padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 15px;
+  }
+
+  #message {
+    margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
   }
 </style>
 </head>
 <body>
 
-<h1>ビンゴゲーム 🎉</h1>
+<h1>🎉 BINGOゲーム 🎉</h1>
 <button onclick="generateBoard()">リセット</button>
 <button onclick="drawNumber()">数字を引く</button>
 <button onclick="toggleBGM()">BGM ON/OFF</button>
@@ -84,7 +86,6 @@
 <div id="board"></div>
 <div id="message"></div>
 
-<!-- BGM -->
 <audio id="bgm" loop>
   <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
@@ -96,14 +97,11 @@ let bgmPlaying = false;
 
 function generateBoard() {
   const boardDiv = document.getElementById('board');
-  const message = document.getElementById('message');
-  const drawn = document.getElementById('drawn');
-  const history = document.getElementById('history');
+  document.getElementById('message').textContent = '';
+  document.getElementById('drawn').textContent = '引いた数字：なし';
+  document.getElementById('history').textContent = '履歴：なし';
 
   boardDiv.innerHTML = '';
-  message.textContent = '';
-  drawn.textContent = '引いた数字：なし';
-  history.textContent = '履歴：なし';
 
   numbers = Array.from({length: 25}, (_, i) => i + 1);
   numbers.sort(() => Math.random() - 0.5);
@@ -162,7 +160,7 @@ function checkBingo() {
   if ([0,1,2,3,4].every(i => grid[i][4-i])) bingo = true;
 
   if (bingo) {
-    document.getElementById('message').textContent = '🎉 ビンゴ！おめでとう！';
+    document.getElementById('message').textContent = '✨ BINGO！✨';
   }
 }
 
@@ -177,7 +175,6 @@ function toggleBGM() {
   }
 }
 
-// 初期化
 generateBoard();
 </script>
 
