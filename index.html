@@ -5,177 +5,165 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BINGOゲーム</title>
 <style>
-  body {
-    font-family: sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-    margin: 0;
-    padding: 20px;
-  }
-
-  h1 { margin-bottom: 10px; }
-
-  #board {
-    display: grid;
-    grid-template-columns: repeat(5, 70px);
-    gap: 10px;
-    justify-content: center;
-    margin: 20px auto;
-  }
-
-  .cell {
-    width: 70px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    border-radius: 15px;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: 0.2s;
-  }
-
-  .marked {
-    background: #ff4d88;
-    color: white;
-    transform: scale(1.1);
-  }
-
-  button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 20px;
-    background: #ff4d88;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 5px;
-  }
-
-  #drawn, #history {
-    margin-top: 10px;
-    font-size: 18px;
-  }
-
-  #history {
-    max-width: 350px;
-    margin: 10px auto;
-    background: white;
-    padding: 10px;
-    border-radius: 15px;
-  }
-
-  #message {
-    margin-top: 20px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #fff;
-  }
+body{font-family:sans-serif;text-align:center;background:linear-gradient(135deg,#f8fbff,#ffeef2,#eef5ff);margin:0;padding:20px}
+h1{margin-bottom:10px}
+#boards{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:20px}
+.board-wrapper{position:relative}
+.board{display:grid;grid-template-columns:repeat(5,60px);gap:8px;background:rgba(255,255,255,0.8);padding:15px;border-radius:15px}
+.cell{width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;font-weight:bold}
+.marked{background:#ff7eb3;color:#fff}
+.free{background:#ddd}
+.bingo-text{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-size:28px;
+  font-weight:bold;
+  background:linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+  -webkit-background-clip:text;
+  color:transparent;
+  display:none;
+}
+button{padding:10px 20px;border:none;border-radius:15px;background:#7aa7ff;color:#fff;margin:5px;cursor:pointer}
+#setup{margin-top:50px}
+#game{display:none}
+#drawn{font-size:22px;margin-top:10px}
+#history{margin-top:10px}
 </style>
 </head>
 <body>
 
-<h1>🎉 BINGOゲーム 🎉</h1>
-<button onclick="generateBoard()">リセット</button>
+<div id="setup">
+<h1>人数を選んでね</h1>
+<button onclick="startGame(1)">1人</button>
+<button onclick="startGame(2)">2人</button>
+<button onclick="startGame(3)">3人</button>
+<button onclick="startGame(4)">4人</button>
+</div>
+
+<div id="game">
+<h1>🎉 BINGO 🎉</h1>
 <button onclick="drawNumber()">数字を引く</button>
-<button onclick="toggleBGM()">BGM ON/OFF</button>
-
-<div id="drawn">引いた数字：なし</div>
-<div id="history">履歴：なし</div>
-<div id="board"></div>
-<div id="message"></div>
-
-<audio id="bgm" loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-</audio>
+<div id="drawn">引いた数字：-</div>
+<div id="history">履歴：</div>
+<div id="boards"></div>
+</div>
 
 <script>
-let numbers = [];
-let drawnNumbers = [];
-let bgmPlaying = false;
+let players=1;
+let drawnNumbers=[];
+let drawing=false;
 
-function generateBoard() {
-  const boardDiv = document.getElementById('board');
-  document.getElementById('message').textContent = '';
-  document.getElementById('drawn').textContent = '引いた数字：なし';
-  document.getElementById('history').textContent = '履歴：なし';
-
-  boardDiv.innerHTML = '';
-
-  numbers = Array.from({length: 25}, (_, i) => i + 1);
-  numbers.sort(() => Math.random() - 0.5);
-  drawnNumbers = [];
-
-  numbers.forEach(num => {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    cell.textContent = num;
-    boardDiv.appendChild(cell);
-  });
+function startGame(n){
+  players=n;
+  document.getElementById('setup').style.display='none';
+  document.getElementById('game').style.display='block';
+  createBoards();
 }
 
-function drawNumber() {
-  if (drawnNumbers.length === 25) return;
+function createBoards(){
+  const container=document.getElementById('boards');
+  container.innerHTML='';
 
-  let remaining = numbers.filter(n => !drawnNumbers.includes(n));
-  let num = remaining[Math.floor(Math.random() * remaining.length)];
+  for(let p=0;p<players;p++){
+    let wrapper=document.createElement('div');
+    wrapper.className='board-wrapper';
 
-  drawnNumbers.push(num);
+    let board=document.createElement('div');
+    board.className='board';
 
-  document.getElementById('drawn').textContent = '引いた数字：' + num;
-  document.getElementById('history').textContent = '履歴：' + drawnNumbers.join(', ');
+    for(let col=0;col<5;col++){
+      let start=col*15+1;
+      let nums=[];
+      for(let i=0;i<15;i++) nums.push(start+i);
+      nums.sort(()=>Math.random()-0.5);
 
-  document.querySelectorAll('.cell').forEach(cell => {
-    if (Number(cell.textContent) === num) {
+      for(let row=0;row<5;row++){
+        let cell=document.createElement('div');
+        cell.className='cell';
+
+        if(col===2 && row===2){
+          cell.textContent='FREE';
+          cell.classList.add('marked','free');
+        }else{
+          cell.textContent=nums[row];
+        }
+
+        board.appendChild(cell);
+      }
+    }
+
+    let bingoText=document.createElement('div');
+    bingoText.className='bingo-text';
+    bingoText.textContent='BINGO!';
+
+    wrapper.appendChild(board);
+    wrapper.appendChild(bingoText);
+    container.appendChild(wrapper);
+  }
+}
+
+function drawNumber(){
+  if(drawing || drawnNumbers.length>=75) return;
+
+  drawing=true;
+  let count=0;
+
+  let interval=setInterval(()=>{
+    let temp=Math.floor(Math.random()*75)+1;
+    document.getElementById('drawn').textContent='引いてる… '+temp;
+    count++;
+
+    if(count>15){
+      clearInterval(interval);
+
+      let num;
+      do{ num=Math.floor(Math.random()*75)+1;}while(drawnNumbers.includes(num));
+
+      drawnNumbers.push(num);
+
+      document.getElementById('drawn').textContent='引いた数字：'+num;
+      document.getElementById('history').textContent='履歴：'+drawnNumbers.join(', ');
+
+      markNumber(num);
+      checkBingo();
+      drawing=false;
+    }
+  },100);
+}
+
+function markNumber(num){
+  document.querySelectorAll('.cell').forEach(cell=>{
+    if(Number(cell.textContent)===num){
       cell.classList.add('marked');
     }
   });
-
-  checkBingo();
 }
 
-function checkBingo() {
-  const cells = document.querySelectorAll('.cell');
-  const grid = [];
+function checkBingo(){
+  document.querySelectorAll('.board-wrapper').forEach(wrapper=>{
+    const cells=wrapper.querySelectorAll('.cell');
+    let grid=[];
 
-  for (let i = 0; i < 5; i++) {
-    grid[i] = [];
-    for (let j = 0; j < 5; j++) {
-      grid[i][j] = cells[i * 5 + j].classList.contains('marked');
+    for(let i=0;i<5;i++){
+      grid[i]=[];
+      for(let j=0;j<5;j++){
+        grid[i][j]=cells[i*5+j].classList.contains('marked');
+      }
     }
-  }
 
-  let bingo = false;
+    let bingo=false;
 
-  for (let i = 0; i < 5; i++) {
-    if (grid[i].every(v => v)) bingo = true;
-  }
+    for(let i=0;i<5;i++) if(grid[i].every(v=>v)) bingo=true;
+    for(let j=0;j<5;j++) if(grid.every(row=>row[j])) bingo=true;
+    if([0,1,2,3,4].every(i=>grid[i][i])) bingo=true;
+    if([0,1,2,3,4].every(i=>grid[i][4-i])) bingo=true;
 
-  for (let j = 0; j < 5; j++) {
-    if (grid.every(row => row[j])) bingo = true;
-  }
-
-  if ([0,1,2,3,4].every(i => grid[i][i])) bingo = true;
-  if ([0,1,2,3,4].every(i => grid[i][4-i])) bingo = true;
-
-  if (bingo) {
-    document.getElementById('message').textContent = '✨ BINGO！✨';
-  }
+    if(bingo){
+      wrapper.querySelector('.bingo-text').style.display='block';
+    }
+  });
 }
-
-function toggleBGM() {
-  const bgm = document.getElementById('bgm');
-  if (!bgmPlaying) {
-    bgm.play();
-    bgmPlaying = true;
-  } else {
-    bgm.pause();
-    bgmPlaying = false;
-  }
-}
-
-generateBoard();
 </script>
 
 </body>
