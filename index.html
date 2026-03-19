@@ -12,44 +12,37 @@ body{
   color:#fff;
   text-align:center;
   font-family:sans-serif;
-  overflow:hidden;
+  background: radial-gradient(circle at 30% 30%, #2a2a2a, #000),
+              radial-gradient(circle at 70% 70%, #3a3a3a, #000);
+  background-blend-mode: screen;
 }
 
-/* 背景 */
-body::before{
-  content:"";
-  position:fixed;
-  width:200%;
-  height:200%;
-  background:radial-gradient(circle at 30% 30%, #222, #000),
-             radial-gradient(circle at 70% 60%, #333, #000);
-  animation:moveBg 10s infinite alternate;
-  z-index:-1;
-}
-@keyframes moveBg{
-  0%{transform:translate(0,0)}
-  100%{transform:translate(-50px,-50px)}
-}
-
-/* タイトル */
 h1{
   font-size:50px;
   font-family:'Orbitron', sans-serif;
+  text-shadow:0 0 10px #fff,0 0 20px #0ff;
+}
+
+button{
+  padding:10px 20px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  background:#fff;
+  color:#000;
+  cursor:pointer;
 }
 
 /* カード配置 */
 #boards{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  grid-template-columns:repeat(2, auto);
+  gap:20px;
   justify-content:center;
+  margin-top:20px;
 }
 
-.board-wrapper{
-  text-align:center;
-}
-
-/* 名前 */
+/* プレイヤー名 */
 .player-name{
   margin-bottom:5px;
   font-weight:bold;
@@ -60,6 +53,10 @@ h1{
   display:grid;
   grid-template-columns:repeat(5,50px);
   gap:5px;
+  background:#b3002d;
+  padding:8px;
+  border-radius:10px;
+  box-shadow:0 0 15px rgba(255,0,0,0.3);
 }
 
 .cell{
@@ -120,16 +117,23 @@ h1{
 
 <h1>BINGO</h1>
 <button onclick="drawNumber()">数字を引く</button>
+<button onclick="resetGame()">リセット</button>
 
 <div id="boards"></div>
-
 <div id="centerBingo"></div>
 
 <script>
 let drawn=[];
-let numbers=[...Array(75)].map((_,i)=>i+1);
-
+let numbers=[];
 let players=["プレイヤー1","プレイヤー2","プレイヤー3","プレイヤー4"];
+
+/* 初期化 */
+function init(){
+  drawn=[];
+  numbers=[...Array(75)].map((_,i)=>i+1);
+  document.getElementById("boards").innerHTML="";
+  createBoard();
+}
 
 /* カード生成 */
 function createBoard(){
@@ -137,7 +141,6 @@ function createBoard(){
 
   players.forEach(name=>{
     let wrapper=document.createElement("div");
-    wrapper.className="board-wrapper";
 
     let nameDiv=document.createElement("div");
     nameDiv.className="player-name";
@@ -177,7 +180,6 @@ function createBoard(){
     boards.appendChild(wrapper);
   });
 }
-createBoard();
 
 /* 数字 */
 function drawNumber(){
@@ -202,7 +204,7 @@ function mark(num){
 
 /* ビンゴ判定 */
 function checkBingo(){
-  let wrappers=document.querySelectorAll(".board-wrapper");
+  let wrappers=document.querySelectorAll("#boards > div");
 
   wrappers.forEach(w=>{
     let name=w.querySelector(".player-name").textContent;
@@ -249,6 +251,15 @@ function showBingo(name){
     center.style.display="none";
   },3000);
 }
+
+/* リセット */
+function resetGame(){
+  document.getElementById("centerBingo").style.display="none";
+  init();
+}
+
+/* 初回起動 */
+init();
 </script>
 
 </body>
