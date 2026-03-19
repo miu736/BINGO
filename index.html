@@ -9,81 +9,72 @@
 <style>
 body{
   margin:0;
-  background:#000;
   color:#fff;
   text-align:center;
   font-family:sans-serif;
+  overflow:hidden;
 }
 
+/* 背景 */
+body::before{
+  content:"";
+  position:fixed;
+  width:200%;
+  height:200%;
+  background:radial-gradient(circle at 30% 30%, #222, #000),
+             radial-gradient(circle at 70% 60%, #333, #000);
+  animation:moveBg 10s infinite alternate;
+  z-index:-1;
+}
+@keyframes moveBg{
+  0%{transform:translate(0,0)}
+  100%{transform:translate(-50px,-50px)}
+}
+
+/* タイトル */
 h1{
   font-size:50px;
-  letter-spacing:6px;
   font-family:'Orbitron', sans-serif;
-  text-shadow:
-    0 0 5px #fff,
-    0 0 10px #0ff,
-    0 0 20px #0ff,
-    0 0 40px #00f;
 }
 
-#setup,#nameInput,#game{
-  margin-top:30px;
-}
-#nameInput,#game{display:none}
-
-button{
-  padding:10px 20px;
-  margin:5px;
-  border:none;
-  border-radius:10px;
-  background:#fff;
-  color:#000;
-  cursor:pointer;
-}
-button:hover{
-  transform:scale(1.1);
-}
-
+/* カード配置 */
 #boards{
   display:grid;
-  gap:15px;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
   justify-content:center;
 }
 
-#boards.one{grid-template-columns:1fr}
-#boards.two{grid-template-columns:repeat(2,1fr)}
-#boards.three{grid-template-columns:repeat(3,1fr)}
-#boards.four{grid-template-columns:repeat(2,1fr)}
+.board-wrapper{
+  text-align:center;
+}
 
-.board-wrapper{position:relative}
-
+/* 名前 */
 .player-name{
   margin-bottom:5px;
   font-weight:bold;
 }
 
+/* カード */
 .board{
   display:grid;
-  grid-template-columns:repeat(5,60px);
-  gap:6px;
-  background:#b3002d;
-  padding:10px;
-  border-radius:10px;
+  grid-template-columns:repeat(5,50px);
+  gap:5px;
 }
 
 .cell{
-  width:60px;
-  height:60px;
+  width:50px;
+  height:50px;
   display:flex;
   align-items:center;
   justify-content:center;
   background:#111;
   border-radius:8px;
-  font-weight:bold;
 }
 
 .header{
-  background:#b3002d;
+  font-size:20px;
+  font-weight:bold;
 }
 
 .marked{
@@ -91,132 +82,71 @@ button:hover{
   color:#000;
 }
 
-.free{
-  background:#444;
-}
-
-#boards.four .board{
-  grid-template-columns:repeat(5,45px);
-}
-#boards.four .cell{
-  width:45px;
-  height:45px;
-  font-size:12px;
-}
-
-.bingo-text{
-  position:absolute;
+/* 中央BINGO */
+#centerBingo{
+  position:fixed;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  font-size:40px;
+  font-size:60px;
   font-weight:bold;
   background:linear-gradient(90deg,red,orange,yellow,green,blue,purple);
   -webkit-background-clip:text;
   color:transparent;
   display:none;
+  z-index:10;
 }
 
-#historyPopup{
+/* シャボン玉 */
+.bubble{
   position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:#111;
-  padding:20px;
-  border-radius:15px;
-  box-shadow:0 0 20px #0ff;
-  display:none;
+  bottom:0;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.3);
+  animation:float 3s linear forwards;
+}
+@keyframes float{
+  to{
+    transform:translateY(-600px) scale(1.5);
+    opacity:0;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div id="setup">
-<h1>BINGO</h1>
-<button onclick="selectPlayers(1)">1人</button>
-<button onclick="selectPlayers(2)">2人</button>
-<button onclick="selectPlayers(3)">3人</button>
-<button onclick="selectPlayers(4)">4人</button>
-</div>
-
-<div id="nameInput">
-<h1>NAME</h1>
-<div id="inputs"></div>
-<button onclick="startGame()">START</button>
-</div>
-
-<div id="game">
 <h1>BINGO</h1>
 <button onclick="drawNumber()">数字を引く</button>
-<button onclick="showHistory()">履歴を見る</button>
-
-<div id="drawn">引いた数字：-</div>
 
 <div id="boards"></div>
-</div>
 
-<div id="historyPopup">
-<h2>履歴</h2>
-<div id="sortedHistory"></div>
-<button onclick="closeHistory()">✗</button>
-</div>
+<div id="centerBingo"></div>
 
 <script>
-let players=1;
-let names=[];
 let drawn=[];
-let drawing=false;
+let numbers=[...Array(75)].map((_,i)=>i+1);
 
-function selectPlayers(n){
-  players=n;
-  document.getElementById("setup").style.display="none";
-  document.getElementById("nameInput").style.display="block";
+let players=["プレイヤー1","プレイヤー2","プレイヤー3","プレイヤー4"];
 
-  const inputs=document.getElementById("inputs");
-  inputs.innerHTML="";
-
-  for(let i=0;i<n;i++){
-    let input=document.createElement("input");
-    input.placeholder="プレイヤー"+(i+1);
-    input.id="name"+i;
-    inputs.appendChild(input);
-  }
-}
-
-function startGame(){
-  names=[];
-  for(let i=0;i<players;i++){
-    let val=document.getElementById("name"+i).value;
-    names.push(val||"Player"+(i+1));
-  }
-
-  document.getElementById("nameInput").style.display="none";
-  document.getElementById("game").style.display="block";
-
-  createBoards();
-}
-
-function createBoards(){
+/* カード生成 */
+function createBoard(){
   const boards=document.getElementById("boards");
-  boards.innerHTML="";
-  boards.className="";
-  boards.classList.add(["one","two","three","four"][players-1]);
 
-  const letters=["B","I","N","G","O"];
+  players.forEach(name=>{
+    let wrapper=document.createElement("div");
+    wrapper.className="board-wrapper";
 
-  for(let p=0;p<players;p++){
-    let wrap=document.createElement("div");
-    wrap.className="board-wrapper";
-
-    let name=document.createElement("div");
-    name.className="player-name";
-    name.textContent=names[p];
+    let nameDiv=document.createElement("div");
+    nameDiv.className="player-name";
+    nameDiv.textContent=name;
 
     let board=document.createElement("div");
     board.className="board";
 
+    let letters=["B","I","N","G","O"];
     letters.forEach(l=>{
       let c=document.createElement("div");
       c.className="cell header";
@@ -234,7 +164,7 @@ function createBoards(){
 
         if(col===2 && row===2){
           c.textContent="FREE";
-          c.classList.add("marked","free");
+          c.classList.add("marked");
         }else{
           c.textContent=nums[row];
         }
@@ -242,56 +172,26 @@ function createBoards(){
       }
     }
 
-    let bingo=document.createElement("div");
-    bingo.className="bingo-text";
-    bingo.textContent="BINGO!";
-
-    wrap.appendChild(name);
-    wrap.appendChild(board);
-    wrap.appendChild(bingo);
-    boards.appendChild(wrap);
-  }
+    wrapper.appendChild(nameDiv);
+    wrapper.appendChild(board);
+    boards.appendChild(wrapper);
+  });
 }
+createBoard();
 
+/* 数字 */
 function drawNumber(){
-  if(drawing) return;
-  drawing=true;
+  if(numbers.length===0)return;
 
-  let count=0;
-  let interval=setInterval(()=>{
-    let temp=Math.floor(Math.random()*75)+1;
-    document.getElementById("drawn").textContent="引いてる… "+temp;
-    count++;
+  let index=Math.floor(Math.random()*numbers.length);
+  let num=numbers.splice(index,1)[0];
+  drawn.push(num);
 
-    if(count>15){
-      clearInterval(interval);
-
-      let num;
-      do{
-        num=Math.floor(Math.random()*75)+1;
-      }while(drawn.includes(num));
-
-      drawn.push(num);
-
-      document.getElementById("drawn").textContent="引いた数字："+num;
-
-      mark(num);
-      checkBingo();
-      drawing=false;
-    }
-  },100);
+  mark(num);
+  checkBingo();
 }
 
-function showHistory(){
-  let sorted=[...drawn].sort((a,b)=>a-b);
-  document.getElementById("sortedHistory").textContent=sorted.join(", ");
-  document.getElementById("historyPopup").style.display="block";
-}
-
-function closeHistory(){
-  document.getElementById("historyPopup").style.display="none";
-}
-
+/* マーク */
 function mark(num){
   document.querySelectorAll(".cell").forEach(c=>{
     if(Number(c.textContent)===num){
@@ -300,10 +200,14 @@ function mark(num){
   });
 }
 
+/* ビンゴ判定 */
 function checkBingo(){
-  document.querySelectorAll(".board-wrapper").forEach(w=>{
+  let wrappers=document.querySelectorAll(".board-wrapper");
+
+  wrappers.forEach(w=>{
+    let name=w.querySelector(".player-name").textContent;
     let cells=w.querySelectorAll(".cell:not(.header)");
-    let g=[...Array(5)].map(()=>Array(5).fill(false));
+    let g=[...Array(5)].map(()=>Array(5));
 
     for(let i=0;i<5;i++){
       for(let j=0;j<5;j++){
@@ -311,18 +215,39 @@ function checkBingo(){
       }
     }
 
-    let b=false;
-    for(let i=0;i<5;i++){
-      if(g[i].every(v=>v)) b=true;
-      if(g.every(r=>r[i])) b=true;
-    }
-    if([0,1,2,3,4].every(i=>g[i][i])) b=true;
-    if([0,1,2,3,4].every(i=>g[i][4-i])) b=true;
+    let bingo=false;
 
-    if(b){
-      w.querySelector(".bingo-text").style.display="block";
+    for(let i=0;i<5;i++){
+      if(g[i].every(v=>v)) bingo=true;
+      if(g.every(r=>r[i])) bingo=true;
+    }
+
+    if([0,1,2,3,4].every(i=>g[i][i])) bingo=true;
+    if([0,1,2,3,4].every(i=>g[i][4-i])) bingo=true;
+
+    if(bingo){
+      showBingo(name);
     }
   });
+}
+
+/* 演出 */
+function showBingo(name){
+  let center=document.getElementById("centerBingo");
+  center.textContent=name + " さん BINGO!";
+  center.style.display="block";
+
+  for(let i=0;i<20;i++){
+    let b=document.createElement("div");
+    b.className="bubble";
+    b.style.left=Math.random()*100+"%";
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(),3000);
+  }
+
+  setTimeout(()=>{
+    center.style.display="none";
+  },3000);
 }
 </script>
 
