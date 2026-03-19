@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>BINGO</title>
 
-<!-- ★ ゲーム風フォント -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
 <style>
@@ -16,12 +15,11 @@ body{
   font-family:sans-serif;
 }
 
-/* タイトル（ネオン） */
+/* タイトル */
 h1{
   font-size:50px;
   letter-spacing:6px;
   font-family:'Orbitron', sans-serif;
-  color:#fff;
   text-shadow:
     0 0 5px #fff,
     0 0 10px #0ff,
@@ -44,7 +42,6 @@ button{
   background:#fff;
   color:#000;
   cursor:pointer;
-  transition:0.2s;
 }
 button:hover{
   transform:scale(1.1);
@@ -103,7 +100,7 @@ button:hover{
   background:#444;
 }
 
-/* 4人のとき小さく */
+/* 4人のとき */
 #boards.four .board{
   grid-template-columns:repeat(5,45px);
 }
@@ -126,11 +123,25 @@ button:hover{
   color:transparent;
   display:none;
 }
+
+/* 履歴ポップアップ */
+#historyPopup{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#111;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 0 20px #0ff;
+  display:none;
+}
 </style>
 </head>
 
 <body>
 
+<!-- 人数 -->
 <div id="setup">
 <h1>BINGO</h1>
 <button onclick="selectPlayers(1)">1人</button>
@@ -139,18 +150,30 @@ button:hover{
 <button onclick="selectPlayers(4)">4人</button>
 </div>
 
+<!-- 名前 -->
 <div id="nameInput">
 <h1>NAME</h1>
 <div id="inputs"></div>
 <button onclick="startGame()">START</button>
 </div>
 
+<!-- ゲーム -->
 <div id="game">
 <h1>BINGO</h1>
 <button onclick="drawNumber()">数字を引く</button>
+<button onclick="showSortedHistory()">履歴を見る</button>
+
 <div id="drawn">引いた数字：-</div>
 <div id="history">履歴：</div>
+
 <div id="boards"></div>
+</div>
+
+<!-- ポップアップ -->
+<div id="historyPopup">
+<h2>履歴（昇順）</h2>
+<div id="sortedHistory"></div>
+<button onclick="closeHistory()">✗</button>
 </div>
 
 <script>
@@ -271,6 +294,16 @@ function drawNumber(){
       drawing=false;
     }
   },100);
+}
+
+function showSortedHistory(){
+  let sorted=[...drawn].sort((a,b)=>a-b);
+  document.getElementById("sortedHistory").textContent=sorted.join(", ");
+  document.getElementById("historyPopup").style.display="block";
+}
+
+function closeHistory(){
+  document.getElementById("historyPopup").style.display="none";
 }
 
 function mark(num){
