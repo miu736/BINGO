@@ -137,8 +137,8 @@ button{
 <div id="game">
 <h1>BINGO</h1>
 <button onclick="drawNumber()">数字を引く</button>
-<div id="drawn">-</div>
-<div id="history"></div>
+<div id="drawn">引いた数字：-</div>
+<div id="history">履歴：</div>
 <div id="boards"></div>
 </div>
 
@@ -150,10 +150,12 @@ let drawing=false;
 
 function selectPlayers(n){
   players=n;
-  setup.style.display="none";
-  nameInput.style.display="block";
+  document.getElementById("setup").style.display="none";
+  document.getElementById("nameInput").style.display="block";
 
+  const inputs=document.getElementById("inputs");
   inputs.innerHTML="";
+
   for(let i=0;i<n;i++){
     let input=document.createElement("input");
     input.placeholder="プレイヤー"+(i+1);
@@ -169,13 +171,14 @@ function startGame(){
     names.push(val||"Player"+(i+1));
   }
 
-  nameInput.style.display="none";
-  game.style.display="block";
+  document.getElementById("nameInput").style.display="none";
+  document.getElementById("game").style.display="block";
 
   createBoards();
 }
 
 function createBoards(){
+  const boards=document.getElementById("boards");
   boards.innerHTML="";
   boards.className="";
   boards.classList.add(["one","two","three","four"][players-1]);
@@ -237,8 +240,8 @@ function drawNumber(){
 
   let count=0;
   let interval=setInterval(()=>{
-    drawnText=Math.floor(Math.random()*75)+1;
-    drawnDisplay.textContent="引いてる… "+drawnText;
+    let temp=Math.floor(Math.random()*75)+1;
+    document.getElementById("drawn").textContent="引いてる… "+temp;
     count++;
 
     if(count>15){
@@ -251,8 +254,8 @@ function drawNumber(){
 
       drawn.push(num);
 
-      drawnDisplay.textContent="引いた："+num;
-      history.textContent="履歴："+drawn.join(", ");
+      document.getElementById("drawn").textContent="引いた数字："+num;
+      document.getElementById("history").textContent="履歴："+drawn.join(", ");
 
       mark(num);
       checkBingo();
