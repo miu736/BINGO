@@ -15,7 +15,6 @@ body{
   font-family:sans-serif;
 }
 
-/* タイトル */
 h1{
   font-size:50px;
   letter-spacing:6px;
@@ -27,13 +26,11 @@ h1{
     0 0 40px #00f;
 }
 
-/* 画面 */
 #setup,#nameInput,#game{
   margin-top:30px;
 }
 #nameInput,#game{display:none}
 
-/* ボタン */
 button{
   padding:10px 20px;
   margin:5px;
@@ -47,7 +44,6 @@ button:hover{
   transform:scale(1.1);
 }
 
-/* カード配置 */
 #boards{
   display:grid;
   gap:15px;
@@ -59,7 +55,6 @@ button:hover{
 #boards.three{grid-template-columns:repeat(3,1fr)}
 #boards.four{grid-template-columns:repeat(2,1fr)}
 
-/* カード */
 .board-wrapper{position:relative}
 
 .player-name{
@@ -100,7 +95,6 @@ button:hover{
   background:#444;
 }
 
-/* 4人のとき */
 #boards.four .board{
   grid-template-columns:repeat(5,45px);
 }
@@ -110,7 +104,6 @@ button:hover{
   font-size:12px;
 }
 
-/* BINGO表示 */
 .bingo-text{
   position:absolute;
   top:50%;
@@ -124,7 +117,6 @@ button:hover{
   display:none;
 }
 
-/* 履歴ポップアップ */
 #historyPopup{
   position:fixed;
   top:50%;
@@ -141,7 +133,6 @@ button:hover{
 
 <body>
 
-<!-- 人数 -->
 <div id="setup">
 <h1>BINGO</h1>
 <button onclick="selectPlayers(1)">1人</button>
@@ -150,28 +141,24 @@ button:hover{
 <button onclick="selectPlayers(4)">4人</button>
 </div>
 
-<!-- 名前 -->
 <div id="nameInput">
 <h1>NAME</h1>
 <div id="inputs"></div>
 <button onclick="startGame()">START</button>
 </div>
 
-<!-- ゲーム -->
 <div id="game">
 <h1>BINGO</h1>
 <button onclick="drawNumber()">数字を引く</button>
-<button onclick="showSortedHistory()">履歴を見る</button>
+<button onclick="showHistory()">履歴を見る</button>
 
 <div id="drawn">引いた数字：-</div>
-<div id="history">履歴：</div>
 
 <div id="boards"></div>
 </div>
 
-<!-- ポップアップ -->
 <div id="historyPopup">
-<h2>履歴（昇順）</h2>
+<h2>履歴</h2>
 <div id="sortedHistory"></div>
 <button onclick="closeHistory()">✗</button>
 </div>
@@ -287,7 +274,6 @@ function drawNumber(){
       drawn.push(num);
 
       document.getElementById("drawn").textContent="引いた数字："+num;
-      document.getElementById("history").textContent="履歴："+drawn.join(", ");
 
       mark(num);
       checkBingo();
@@ -296,7 +282,7 @@ function drawNumber(){
   },100);
 }
 
-function showSortedHistory(){
+function showHistory(){
   let sorted=[...drawn].sort((a,b)=>a-b);
   document.getElementById("sortedHistory").textContent=sorted.join(", ");
   document.getElementById("historyPopup").style.display="block";
