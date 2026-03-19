@@ -6,7 +6,7 @@
 <title>BINGOゲーム</title>
 <style>
 body{font-family:sans-serif;text-align:center;background:#000;color:#fff;margin:0;padding:20px}
-h1{margin-bottom:10px;font-size:48px;font-weight:800;letter-spacing:6px}
+h1{margin-bottom:10px;font-size:52px;font-weight:900;letter-spacing:6px;font-family:'Arial Black','Impact','Segoe UI',sans-serif;text-transform:uppercase}
 
 #setup,#nameInput,#game{margin-top:50px}
 #nameInput,#game{display:none}
@@ -22,6 +22,11 @@ button{padding:10px 20px;border:none;border-radius:15px;background:#fff;color:#0
 .board-wrapper{position:relative}
 .player-name{margin-bottom:5px;font-weight:bold}
 .board{display:grid;grid-template-columns:repeat(5,60px);gap:8px;background:#b3002d;padding:15px;border-radius:15px}
+
+/* 4人のときはカード小さく */
+#boards.four .board{grid-template-columns:repeat(5,45px);gap:6px;padding:10px}
+#boards.four .cell{width:45px;height:45px;font-size:12px}
+#boards.four .header{font-size:16px}
 .cell{width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:#111;border-radius:10px;font-weight:bold}
 .header{background:#b3002d;color:#fff;font-size:22px;font-weight:bold;letter-spacing:2px}
 .marked{background:#fff;color:#000}
