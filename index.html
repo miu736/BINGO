@@ -90,12 +90,14 @@ function startGame(){
 
 function createBoards(){
   const container=document.getElementById('boards');
+
+  // 人数ごとのクラス設定
   container.className='';
   if(players===1) container.classList.add('one');
   if(players===2) container.classList.add('two');
   if(players===3) container.classList.add('three');
   if(players===4) container.classList.add('four');
-  const container=document.getElementById('boards');
+
   container.innerHTML='';
 
   const letters=['B','I','N','G','O'];
@@ -111,12 +113,46 @@ function createBoards(){
     let board=document.createElement('div');
     board.className='board';
 
+    // ヘッダー
     for(let i=0;i<5;i++){
       let cell=document.createElement('div');
       cell.className='cell header';
       cell.textContent=letters[i];
       board.appendChild(cell);
     }
+
+    // 数字
+    for(let col=0;col<5;col++){
+      let start=col*15+1;
+      let nums=[];
+      for(let i=0;i<15;i++) nums.push(start+i);
+      nums.sort(()=>Math.random()-0.5);
+
+      for(let row=0;row<5;row++){
+        let cell=document.createElement('div');
+        cell.className='cell';
+
+        if(col===2 && row===2){
+          cell.textContent='FREE';
+          cell.classList.add('marked','free');
+        }else{
+          cell.textContent=nums[row];
+        }
+
+        board.appendChild(cell);
+      }
+    }
+
+    let bingoText=document.createElement('div');
+    bingoText.className='bingo-text';
+    bingoText.textContent='BINGO!';
+
+    wrapper.appendChild(nameDiv);
+    wrapper.appendChild(board);
+    wrapper.appendChild(bingoText);
+    container.appendChild(wrapper);
+  }
+}
 
     for(let col=0;col<5;col++){
       let start=col*15+1;
