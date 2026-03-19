@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title>BINGO</title>
+
+<!-- ★ ゲーム風フォント -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+
 <style>
 body{
   margin:0;
@@ -12,11 +16,17 @@ body{
   font-family:sans-serif;
 }
 
-/* タイトル */
+/* タイトル（ネオン） */
 h1{
   font-size:50px;
   letter-spacing:6px;
-  font-family:'Impact','Arial Black',sans-serif;
+  font-family:'Orbitron', sans-serif;
+  color:#fff;
+  text-shadow:
+    0 0 5px #fff,
+    0 0 10px #0ff,
+    0 0 20px #0ff,
+    0 0 40px #00f;
 }
 
 /* 画面 */
@@ -34,6 +44,10 @@ button{
   background:#fff;
   color:#000;
   cursor:pointer;
+  transition:0.2s;
+}
+button:hover{
+  transform:scale(1.1);
 }
 
 /* カード配置 */
@@ -117,7 +131,6 @@ button{
 
 <body>
 
-<!-- 人数選択 -->
 <div id="setup">
 <h1>BINGO</h1>
 <button onclick="selectPlayers(1)">1人</button>
@@ -126,14 +139,12 @@ button{
 <button onclick="selectPlayers(4)">4人</button>
 </div>
 
-<!-- 名前入力 -->
 <div id="nameInput">
-<h1>名前入力</h1>
+<h1>NAME</h1>
 <div id="inputs"></div>
-<button onclick="startGame()">スタート</button>
+<button onclick="startGame()">START</button>
 </div>
 
-<!-- ゲーム -->
 <div id="game">
 <h1>BINGO</h1>
 <button onclick="drawNumber()">数字を引く</button>
@@ -196,7 +207,6 @@ function createBoards(){
     let board=document.createElement("div");
     board.className="board";
 
-    // ヘッダー
     letters.forEach(l=>{
       let c=document.createElement("div");
       c.className="cell header";
@@ -204,7 +214,6 @@ function createBoards(){
       board.appendChild(c);
     });
 
-    // 数字
     for(let col=0;col<5;col++){
       let nums=[...Array(15)].map((_,i)=>col*15+i+1);
       nums.sort(()=>Math.random()-0.5);
